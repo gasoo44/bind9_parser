@@ -290,10 +290,7 @@ options_stmt_dnstap_output_element = (
 options_stmt_dnstap_output = (
     Group(
         Keyword('dnstap-output').suppress()
-        - Optional(
-            Keyword('file')
-            | Keyword('unix')
-        )
+        - (Keyword('file') | Keyword('unix'))('type')
         - dequoted_path_name('path')
         - ZeroOrMore(options_stmt_dnstap_output_element)
         - semicolon
