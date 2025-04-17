@@ -472,15 +472,19 @@ options_stmt_dnstap_output_element = (
 options_stmt_dnstap_output = (
     Group(
         Keyword('dnstap-output').suppress()
+<<<<<<< HEAD
         - Optional(
             Keyword('file')
             | Keyword('unix'))
+=======
+        - (Keyword('file') | Keyword('unix'))('type')
+>>>>>>> named-checkconf_fix
         - dequoted_path_name('path')
-        - OneOrMore(options_stmt_dnstap_output_element)
+        - ZeroOrMore(options_stmt_dnstap_output_element)
         - semicolon
     )('dnstap-output')
 )
-options_stmt_dnstap_output.setName('dnstap-output ( file | unix } <quotable-filepath>;')
+options_stmt_dnstap_output.setName('dnstap-output ( file | unix ) <quotable-filepath>;')
 
 options_stmt_dnstap_version = (
     Keyword('dnstap-version').suppress()

@@ -308,7 +308,7 @@ deny-answer-addresses {
         assert_parser_result_dict_true(
             options_stmt_dnstap_output,
             'dnstap-output file "dir/file" size 1G suffix timestamp versions 5;',
-            {'dnstap-output': {'path': 'dir/file', 'size': 1, 'versions': 5}}
+            {'dnstap-output': {'type': 'file', 'path': 'dir/file', 'size': 1, 'versions': 5}}
         )
 
     def test_isc_options_stmt_dnstap_version_file_passing(self):

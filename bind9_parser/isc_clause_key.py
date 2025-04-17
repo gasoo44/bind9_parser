@@ -32,7 +32,7 @@ key_algorithm_name_dequotable.setName('<quotable-key-algorithm>')
 # algorithm <string>;
 key_algorithm_element = (
         Keyword('algorithm').suppress()
-        - key_algorithm_name_dequotable('algorithm')
+        - key_algorithm_name_dequotable
         + semicolon
 )
 key_algorithm_element.setName('algorithm <key-algorithm>;')
