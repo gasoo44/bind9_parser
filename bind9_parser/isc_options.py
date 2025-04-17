@@ -472,9 +472,11 @@ options_stmt_dnstap_output_element = (
 options_stmt_dnstap_output = (
     Group(
         Keyword('dnstap-output').suppress()
-        - (Keyword('file') | Keyword('unix'))('type')
+        - Optional(
+            Keyword('file')
+            | Keyword('unix'))
         - dequoted_path_name('path')
-        - ZeroOrMore(options_stmt_dnstap_output_element)
+        - OneOrMore(options_stmt_dnstap_output_element)
         - semicolon
     )('dnstap-output')
 )
