@@ -115,7 +115,7 @@ logging_allowed_facility_names = (
         ^ Keyword('local5')
         ^ Keyword('local6')
         ^ Keyword('local7')
-    )
+    )('facility')
 )
 
 logging_facility_name_dequotable = (
@@ -129,7 +129,7 @@ logging_facility_name_dequotable = (
 )
 logging_facility_name_dequotable.setName('<quotable_facility_name>')
 
-logging_chan_syslog_facility_name = logging_facility_name_dequotable('facility')
+logging_chan_syslog_facility_name = logging_facility_name_dequotable
 logging_chan_syslog_facility_name.setName(
     '(kern|user|mail|daemon|auth|syslog|lpr|news|uucp|cron|authpriv|ftp|local1-7)')
 
