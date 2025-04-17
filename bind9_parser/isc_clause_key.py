@@ -9,7 +9,7 @@ Title: Clause statement for key
 Description: Provides key-related grammar in PyParsing engine
              for ISC-configuration style
 """
-from pyparsing import Word, alphanums, Group, Keyword, ZeroOrMore
+from pyparsing import Word, Char, alphanums, Group, Keyword, ZeroOrMore
 from bind9_parser.isc_utils import semicolon, lbrack, rbrack, key_id, key_secret_dequotable
 
 # NOTE: If any declaration here is to be used OUTSIDE of the 'keys' clause,
@@ -18,10 +18,21 @@ from bind9_parser.isc_utils import semicolon, lbrack, rbrack, key_id, key_secret
 key_algorithm_name = Word(alphanums + '-')('algorithm')
 key_algorithm_name.setName('<key-algorithm>')
 
+key_algorithm_name_dequotable = (
+    (
+            Char('"').suppress() + key_algorithm_name + Char('"').suppress()
+    )
+    ^ (
+            Char("'").suppress() + key_algorithm_name + Char("'").suppress()
+    )
+    ^ key_algorithm_name
+)
+key_algorithm_name_dequotable.setName('<quotable-key-algorithm>')
+
 # algorithm <string>;
 key_algorithm_element = (
         Keyword('algorithm').suppress()
-        - key_algorithm_name('algorithm')
+        - key_algorithm_name_dequotable('algorithm')
         + semicolon
 )
 key_algorithm_element.setName('algorithm <key-algorithm>;')
