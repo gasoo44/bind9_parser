@@ -93,28 +93,43 @@ logging_chan_file_path_element = (
     - Optional(logging_chan_file_path_size_element)
 )
 
-logging_chan_syslog_facility_name = (
-    Keyword('kern')
-    ^ Keyword('user')
-    ^ Keyword('mail')
-    ^ Keyword('daemon')
-    ^ Keyword('auth')
-    ^ Keyword('syslog')
-    ^ Keyword('lpr')
-    ^ Keyword('news')
-    ^ Keyword('uucp')
-    ^ Keyword('cron')
-    ^ Keyword('authpriv')
-    ^ Keyword('ftp')
-    ^ Keyword('local0')
-    ^ Keyword('local1')
-    ^ Keyword('local2')
-    ^ Keyword('local3')
-    ^ Keyword('local4')
-    ^ Keyword('local5')
-    ^ Keyword('local6')
-    ^ Keyword('local7')
-)('facility')
+logging_allowed_facility_names = (
+    (
+        Keyword('kern')
+        ^ Keyword('user')
+        ^ Keyword('mail')
+        ^ Keyword('daemon')
+        ^ Keyword('auth')
+        ^ Keyword('syslog')
+        ^ Keyword('lpr')
+        ^ Keyword('news')
+        ^ Keyword('uucp')
+        ^ Keyword('cron')
+        ^ Keyword('authpriv')
+        ^ Keyword('ftp')
+        ^ Keyword('local0')
+        ^ Keyword('local1')
+        ^ Keyword('local2')
+        ^ Keyword('local3')
+        ^ Keyword('local4')
+        ^ Keyword('local5')
+        ^ Keyword('local6')
+        ^ Keyword('local7')
+    )
+)
+
+logging_facility_name_dequotable = (
+    (
+            Char('"').suppress() + logging_allowed_facility_names + Char('"').suppress()
+    )
+    ^ (
+            Char("'").suppress() + logging_allowed_facility_names + Char("'").suppress()
+    )
+    ^ logging_allowed_facility_names
+)
+logging_facility_name_dequotable.setName('<quotable_facility_name>')
+
+logging_chan_syslog_facility_name = logging_facility_name_dequotable('facility')
 logging_chan_syslog_facility_name.setName(
     '(kern|user|mail|daemon|auth|syslog|lpr|news|uucp|cron|authpriv|ftp|local1-7)')
 
