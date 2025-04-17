@@ -295,11 +295,11 @@ options_stmt_dnstap_output = (
             | Keyword('unix')
         )
         - dequoted_path_name('path')
-        - OneOrMore(options_stmt_dnstap_output_element)
+        - ZeroOrMore(options_stmt_dnstap_output_element)
         - semicolon
     )('dnstap-output')
 )
-options_stmt_dnstap_output.setName('dnstap-output ( file | unix } <quotable-filepath>;')
+options_stmt_dnstap_output.setName('dnstap-output ( file | unix ) <quotable-filepath>;')
 
 options_stmt_dnstap_version = (
     Keyword('dnstap-version').suppress()
