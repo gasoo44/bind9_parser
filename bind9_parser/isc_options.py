@@ -10,7 +10,8 @@ Description: Various 'options' statement that is used
              only by 'options' clause.
 """
 from pyparsing import Group, Keyword, Optional, Combine, \
-    ZeroOrMore, OneOrMore, Literal, ungroup, CaselessLiteral
+    ZeroOrMore, OneOrMore, Literal, ungroup, CaselessLiteral, \
+    quotedString, removeQuotes
 from pyparsing import pyparsing_common
 from bind9_parser.isc_utils import lbrack, rbrack, semicolon, size_spec, \
     dequotable_path_name, number_type, seconds_type, \
@@ -18,7 +19,7 @@ from bind9_parser.isc_utils import lbrack, rbrack, semicolon, size_spec, \
     exclamation, dequoted_path_name, squote, dquote, \
     fqdn_name_dequoted, fqdn_name_dequotable, quotable_name, \
     size_spec_nodefault, iso8601_duration, tsig_session_key_name
-from bind9_parser.isc_inet import ip_port, \
+from bind9_parser.isc_inet import ip_port, ip46_addr, \
     inet_dscp_port_keyword_and_number_element, \
     inet_http_port_keyword_and_number_element, \
     inet_ip_port_keyword_and_number_element, \
@@ -27,6 +28,187 @@ from bind9_parser.isc_inet import ip_port, \
 from bind9_parser.isc_domain import dequotable_domain_generic_fqdn
 from bind9_parser.isc_aml import aml_nesting, aml_choices
 
+# QIP custom options
+# qddns {
+# 	allow-secondary-update <boolean>;
+# 	rrset-order <boolean>;
+# 	unix-use-unbuffered-write-for-journal <boolean>;
+# 	sync-journal-to-disk <boolean>;
+# 	remove-cname-on-cname-and-other-data-error <boolean>;
+# 	udp-socket-rcvbuf <integer>;
+# 	retry-tcp-on-truncate <boolean>;
+# 	client-edns <boolean>;
+# 	snmp-stats <boolean>;
+# 	edup {
+# 		my-ip ( <ipv4_address> | <ipv6_address> );
+# 		message-service-ip ( <ipv4_address> | <ipv6_address> );
+# 		message-service-port <integer>;
+# 		org-id <integer>;
+# 		rr-types { <quoted_string>; ... };
+# 	};
+# 	gss-principal <quoted_string>
+# 	max-rdataset-for-update <integer>;
+# 	notify-after-load <boolean>;
+# 	lock-isc-stats <boolean>;
+# 	gss-max-contexts <integer>;
+# };
+
+options_qddns_edup_options = (
+    
+        Group(
+            (
+                Keyword('my-ip').suppress()
+                - ip46_addr('my-ip')
+            )('')
+            | (
+                Keyword('message-service-ip').suppress()
+                - ip46_addr('message-service-ip')
+            )('')
+            | (
+                Keyword('message-service-port').suppress()
+                - ip_port('message-service-port')
+            )('')
+            | (
+                Keyword('org-id').suppress()
+                - number_type('org_id')
+            )('')
+            | (
+                Keyword('rr-types').suppress()
+                - lbrack
+                - OneOrMore(
+                    quotedString.setParseAction(removeQuotes)
+                )('rr_types')
+                - rbrack
+                - semicolon
+            )('')
+        )
+    
+    + semicolon
+)
+# options_qddns_edup_options.setName("""
+#     [ my-ip ( <ipv4_address> | <ipv6_address> ); ]
+#     [ message-service-ip ( <ipv4_address> | <ipv6_address> ); ]
+#     [ message-service-port <integer>; ]
+#     [ org-id <integer>; ]
+#     [ rr-types { <quoted_string>; ... }; ]
+# """)
+
+options_qddns_options = (
+    
+        Group(
+            (
+                Keyword('allow-secondary-update').suppress()
+                - isc_boolean('allow-secondary-update')
+            )('')
+            | (
+                Keyword('rrset-order').suppress()
+                - isc_boolean('rrset-order')
+            )('')
+            | (
+                Keyword('unix-use-unbuffered-write-for-journal').suppress()
+                - isc_boolean('unix-use-unbuffered-write-for-journal')
+            )('')
+            | (
+                Keyword('sync-journal-to-disk').suppress()
+                - isc_boolean('sync-journal-to-disk')
+            )('')
+            | (
+                Keyword('remove-cname-on-cname-and-other-data-error').suppress()
+                - isc_boolean('remove-cname-on-cname-and-other-data-error')
+            )('')
+            | (
+                Keyword('udp-socket-rcvbuf').suppress()
+                - number_type('udp-socket-rcvbuf')
+            )('')
+            | (
+                Keyword('retry-tcp-on-truncate').suppress()
+                - isc_boolean('retry-tcp-on-truncate')
+            )('')
+            | (
+                Keyword('client-edns').suppress()
+                - isc_boolean('client-edns')
+            )('')
+            | (
+                Keyword('snmp-stats').suppress()
+                - isc_boolean('snmp-stats')
+            )('')
+            | (
+                Keyword('edup').suppress()
+                - lbrack
+                - OneOrMore(
+                    options_qddns_edup_options
+                )('edup')
+                - rbrack
+            )('')
+            | (
+                Keyword('gss-principal').suppress()
+                - quotedString.setParseAction(removeQuotes)('gss-principal')
+            )('')
+            | (
+                Keyword('max-rdataset-for-update').suppress()
+                - number_type('max-rdataset-for-update')
+            )('')
+            | (
+                Keyword('notify-after-load').suppress()
+                - isc_boolean('notify-after-load')
+            )('')
+            | (
+                Keyword('lock-isc-stats').suppress()
+                - isc_boolean('lock-isc-stats')
+            )('')
+            | (
+                Keyword('gss-max-contexts').suppress()
+                - number_type('gss-max-contexts')
+            )('')
+        )
+        + semicolon
+    
+)
+# options_qddns_options.setName("""
+#     [ allow-secondary-update <boolean>; ]
+#     [ rrset-order <boolean>; ]
+#     [ unix-use-unbuffered-write-for-journal <boolean>; ]
+#     [ sync-journal-to-disk <boolean>; ]
+#     [ remove-cname-on-cname-and-other-data-error <boolean>; ]
+#     [ udp-socket-rcvbuf <integer>; ]
+#     [ retry-tcp-on-truncate <boolean>; ]
+#     [ client-edns <boolean>; ]
+#     [ snmp-stats <boolean>; ]
+#     [ edup { <options> }; ]
+#     [ gss-principal <quoted_string> ]
+#     [ max-rdataset-for-update <integer>; ]
+#     [ notify-after-load <boolean>; ]
+#     [ lock-isc-stats <boolean>; ]
+#     [ gss-max-contexts <integer>; ]
+# """)
+
+options_stmt_qddns = (
+    Keyword('qddns').suppress()
+    - lbrack
+    - OneOrMore(
+        options_qddns_options
+    )('qddns')
+    - rbrack
+    - semicolon
+)('')
+options_stmt_qddns.setName("""
+qddns {
+    [ allow-secondary-update <boolean>; ]
+    [ rrset-order <boolean>; ]
+    [ unix-use-unbuffered-write-for-journal <boolean>; ]
+    [ sync-journal-to-disk <boolean>; ]
+    [ remove-cname-on-cname-and-other-data-error <boolean>; ]
+    [ udp-socket-rcvbuf <integer>; ]
+    [ retry-tcp-on-truncate <boolean>; ]
+    [ client-edns <boolean>; ]
+    [ snmp-stats <boolean>; ]
+    [ edup { <options> }; ]
+    [ gss-principal <quoted_string> ]
+    [ max-rdataset-for-update <integer>; ]
+    [ notify-after-load <boolean>; ]
+    [ lock-isc-stats <boolean>; ]
+    [ gss-max-contexts <integer>; ]
+};""")
 
 options_stmt_acache_cleaning_interval = (
     Keyword('acache-cleaning-interval').suppress()
@@ -290,12 +472,9 @@ options_stmt_dnstap_output_element = (
 options_stmt_dnstap_output = (
     Group(
         Keyword('dnstap-output').suppress()
-        - Optional(
-            Keyword('file')
-            | Keyword('unix')
-        )
+        - (Keyword('file') | Keyword('unix'))('type')
         - dequoted_path_name('path')
-        - OneOrMore(options_stmt_dnstap_output_element)
+        - ZeroOrMore(options_stmt_dnstap_output_element)
         - semicolon
     )('dnstap-output')
 )
@@ -985,7 +1164,8 @@ options_multiple_stmt_tkey_dhkey = ZeroOrMore(
 # Keywords are in dictionary-order, but with longest pattern as having been listed firstly
 # This is irritating; was forced to used '^' over '|' in options_statements_set()
 options_statements_set = (
-    options_stmt_acache_cleaning_interval
+    options_stmt_qddns
+    ^ options_stmt_acache_cleaning_interval
     ^ options_stmt_acache_enable
     ^ options_stmt_answer_cookie
     ^ options_stmt_automatic_interface_scan
