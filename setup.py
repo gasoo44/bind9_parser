@@ -18,7 +18,7 @@ packages = [
     'bind9_parser',
 ]
 
-bind9_parser_version = '0.99.3'
+bind9_parser_version = '0.99.4'
 
 setup(  # Distribution meta-data
     name='bind9_parser',
