@@ -713,7 +713,7 @@ class TestClauseALL(unittest.TestCase):
                                                         'min_update_interval': '20S',
                                                         'nsdname_enable': 'yes',
                                                         'nsip_enable': 'yes',
-                                                        'policy': [[]],
+                                                        'policy': ['cname'],
                                                         'recursive_only': 'yes',
                                                         'zone_name': '168.192.in-addr.arpa.'},
                                                        {'add_soa': 'no',
@@ -1406,7 +1406,7 @@ options {
                                                         'min_update_interval': '20S',
                                                         'nsdname_enable': 'yes',
                                                         'nsip_enable': 'yes',
-                                                        'policy': [[]],
+                                                        'policy': ['cname'], # Nokia
                                                         'recursive_only': 'yes',
                                                         'zone_name': '168.192.in-addr.arpa.'},
                                                        {'add_soa': 'no',

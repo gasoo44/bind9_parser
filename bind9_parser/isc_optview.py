@@ -14,7 +14,7 @@ import copy
 
 from pyparsing import Group, Keyword, OneOrMore, Literal, \
     CaselessLiteral, Combine, Optional, Word, alphanums, ZeroOrMore, \
-    ungroup
+    ungroup, removeQuotes
 from bind9_parser.isc_utils import isc_boolean, semicolon, lbrack, rbrack, \
     number_type, name_type, minute_type, \
     dequoted_path_name, check_options, \
@@ -1205,8 +1205,14 @@ optview_stmt_response_policy_element_zone_policy_type = (
             Literal('tcp-only').suppress()  # introduced in v9.10
             - rr_fqdn_w_absolute('tcp_only')
         )  # TODO re-verify string-format needed for 'tcp-only'
-        | Group(
-            Literal('cname').suppress()  # - rr_fqdn_w_absolute('cname')
+        | (   # Nokia DNS Shenanigans
+            (
+                Literal('cname')
+            )
+            ^ (
+                Literal('cname')
+                + quoted_domain_generic_fqdn.setParseAction(removeQuotes)
+            )
         )
     )('policy')
 )
@@ -1249,7 +1255,7 @@ optview_stmt_response_policy_zone_group_set.setName("""
         [ log boolean ]  # v9.11
         [ max-policy-ttl duration ]
         [ min-update-interval duration ]   # 9.12
-        [ policy ( cname | disabled   # cname used to take a string @9.8
+        [ policy ( cname quoted_string | disabled   # cname used to take a string @9.8 (Nokia DNS still supports this)
           | drop | given | no-op   # drop @ v9.10
           | nodata | nxdomain
           | passthru | tcp-only quoted_string ) ]  # tcp-only @ v9.10
